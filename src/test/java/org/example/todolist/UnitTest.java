@@ -2,7 +2,6 @@ package org.example.todolist;
 
 
 import org.example.todolist.entities.Task;
-
 import org.example.todolist.repositories.TaskRepository;
 import org.example.todolist.services.impl.TaskServiceImpl;
 import org.junit.jupiter.api.Test;
@@ -16,7 +15,6 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)

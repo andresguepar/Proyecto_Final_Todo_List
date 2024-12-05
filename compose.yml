@@ -1,3 +1,4 @@
+
 services:
   todolist_app:
     container_name: todolist_app
@@ -8,10 +9,18 @@ services:
       - DATABASE_URL=jdbc:postgresql://todolist_db:5432/todolist
       - DATABASE_USERNAME=postgres
       - DATABASE_PASSWORD=postgres
+      - SPRING_REDIS_HOST=redis
+      - SPRING_REDIS_PORT=6379
     depends_on:
       - todolist_db
+      - redis
     working_dir: /app
     command: mvn spring-boot:run
+
+  redis:
+    image: redis:latest
+    ports:
+      - 6379:6379
 
   todolist_db:
     container_name: todolist_db
@@ -22,6 +31,7 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: todolist
+
   todolist_test:
     container_name: todolist_test
     image: maven:3.8.4-openjdk-17-slim
@@ -30,6 +40,9 @@ services:
       - .:/app
     environment:
       - DATABASE_URL=jdbc:postgresql://todolist_db:5432/todolist
+      - SPRING_REDIS_HOST=redis
+      - SPRING_REDIS_PORT=6379
     depends_on:
       - todolist_db
+      - redis
     command: mvn test

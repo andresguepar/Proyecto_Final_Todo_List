@@ -3,6 +3,7 @@ package org.example.todolist.controller;
 
 import org.example.todolist.entities.Task;
 import org.example.todolist.services.TaskService;
+import org.example.todolist.services.impl.RedisService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,6 +15,18 @@ import java.util.Optional;
 public class TaskController {
     @Autowired
     private TaskService taskService;
+
+    private final RedisService redisService;
+
+    public TaskController(RedisService redisService) {
+        this.redisService = redisService;
+    }
+
+    @GetMapping("/{id}/exists")
+    public boolean exists(@PathVariable String id) {
+        return redisService.exists("task:" + id);
+    }
+
     @PostMapping("/create")
     public ResponseEntity<Task> create(@RequestBody String title){
         Task task = new Task.Builder()
