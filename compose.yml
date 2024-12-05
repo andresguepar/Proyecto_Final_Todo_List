@@ -1,0 +1,35 @@
+services:
+  todolist_app:
+    container_name: todolist_app
+    build: .
+    ports:
+      - 8080:8080
+    environment:
+      - DATABASE_URL=jdbc:postgresql://todolist_db:5432/todolist
+      - DATABASE_USERNAME=postgres
+      - DATABASE_PASSWORD=postgres
+    depends_on:
+      - todolist_db
+    working_dir: /app
+    command: mvn spring-boot:run
+
+  todolist_db:
+    container_name: todolist_db
+    image: postgres:15
+    ports:
+      - 5434:5432
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: todolist
+  todolist_test:
+    container_name: todolist_test
+    image: maven:3.8.4-openjdk-17-slim
+    working_dir: /app
+    volumes:
+      - .:/app
+    environment:
+      - DATABASE_URL=jdbc:postgresql://todolist_db:5432/todolist
+    depends_on:
+      - todolist_db
+    command: mvn test
