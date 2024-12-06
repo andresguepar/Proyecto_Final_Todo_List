@@ -1,0 +1,38 @@
+name: TodoList CI/CD
+
+on:
+  push:
+    branches: "master"
+  pull_request:
+    branches: "master"
+
+jobs:
+  build-and-test:
+    name: Build and Test with Docker Compose
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Install Docker Compose
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y docker-compose
+
+    - name: Build and Run Services
+      run: docker-compose up --build -d
+
+    - name: Wait for Services to be Healthy
+      run: |
+        echo "Waiting for services to be healthy..."
+        docker-compose ps
+        docker-compose logs
+        sleep 20
+
+    - name: Run Tests
+      run: docker-compose run --rm todolist_test
+
+    - name: Simulate Deployment
+      if: success()
+      run: echo "🚀 TodoList App desplegada exitosamente en $(date)"
