@@ -34,26 +34,26 @@ public class RedisTest {
 
         @Test
         public void testCreateTaskInDatabase() throws Exception {
-            // Preparar el título de la tarea
+
             String taskTitle = "Tarea de prueba";
 
-            // Realizar la solicitud POST para crear la tarea
+
             MvcResult result = mockMvc.perform(post("/tasks/create")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(taskTitle))
                     .andExpect(status().isOk())
                     .andReturn();
 
-            // Convertir la respuesta a un objeto Task
+
             String jsonResponse = result.getResponse().getContentAsString();
             ObjectMapper objectMapper = new ObjectMapper();
             Task createdTask = objectMapper.readValue(jsonResponse, Task.class);
 
-            // Verificaciones
+
             assertNotNull(createdTask.getId(), "El ID de la tarea no debería ser nulo");
             assertEquals(taskTitle, createdTask.getTitle(), "El título de la tarea debe coincidir");
 
-            // Verificar que la tarea existe en la base de datos
+
             Optional<Task> retrievedTask = taskRepository.findById(createdTask.getId());
             assertTrue(retrievedTask.isPresent(), "La tarea debe existir en la base de datos");
             assertEquals(taskTitle, retrievedTask.get().getTitle(), "El título en la base de datos debe coincidir");

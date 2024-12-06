@@ -11,6 +11,6 @@ WORKDIR /app
 
 COPY --from=build /app/target/todolist-0.0.1-SNAPSHOT.jar todolist-app.jar
 
-# Comando para ejecutar la aplicación
+
 ENTRYPOINT ["java", "-jar", "todolist-app.jar"]
 

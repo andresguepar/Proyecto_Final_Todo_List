@@ -39,7 +39,7 @@ public class SystemTest {
 
     private final Task task = new Task.Builder()
             .id(1)
-            .title("Titulo de tarea")
+            .title("Hacer las compras")
             .build();
 
 
