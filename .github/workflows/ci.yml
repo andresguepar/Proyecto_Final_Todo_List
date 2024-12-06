@@ -64,15 +64,8 @@ jobs:
         docker push ${{ secrets.DOCKERHUB_USERNAME }}/todolist-app:${{ github.sha }}
 
     - name: Run Tests
-        env:
-          DATABASE_URL: jdbc:postgresql://localhost:5432/todolist
-          DATABASE_USERNAME: postgres
-          DATABASE_PASSWORD: postgres
-          SPRING_REDIS_HOST: localhost
-          SPRING_REDIS_PORT: 6379
-          SPRING_PROFILES_ACTIVE: test
-        run: mvn test
+      run: mvn test
 
-      - name: Deployed!!
-          if: success()
-          run: echo "🚀 TodoList App desplegada exitosamente en $(date)"
+    - name: Deployed!!
+      if: success()
+      run: echo "🚀 TodoList App desplegada exitosamente en $(date)"
