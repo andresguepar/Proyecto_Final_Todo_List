@@ -19,7 +19,7 @@ jobs:
       run: docker-compose version
 
     - name: Build and Run Services
-      run: dockern compose up --build -d
+      run: docker compose up --build -d
 
     - name: Wait for Services to be Healthy
       run: |
