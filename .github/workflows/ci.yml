@@ -15,11 +15,13 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3
 
-    - name: Set up Docker Compose
-      run: docker compose version
+    - name: Install Docker Compose
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y docker-compose
 
     - name: Build and Run Services
-      run: docker compose up --build -d
+      run: docker-compose up --build -d
 
     - name: Wait for Services to be Healthy
       run: |
@@ -29,9 +31,8 @@ jobs:
         sleep 20
 
     - name: Run Tests
-      run: docker compose run --rm todolist_test
+      run: docker-compose run --rm todolist_test
 
     - name: Simulate Deployment
       if: success()
       run: echo "🚀 TodoList App desplegada exitosamente en $(date)"
-
