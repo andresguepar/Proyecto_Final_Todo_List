@@ -48,15 +48,6 @@ jobs:
     - name: Build with Maven
       run: mvn clean package -DskipTests
     
-    - name: Run Tests
-      env:
-        DATABASE_URL: jdbc:postgresql://localhost:5432/todolist
-        DATABASE_USERNAME: postgres
-        DATABASE_PASSWORD: postgres
-        SPRING_REDIS_HOST: localhost
-        SPRING_REDIS_PORT: 6379
-        SPRING_PROFILES_ACTIVE: test
-      run: mvn test
     
     - name: Build Docker Image
       run: docker build -t todolist-app .
@@ -72,32 +63,16 @@ jobs:
         docker tag todolist-app ${{ secrets.DOCKERHUB_USERNAME }}/todolist-app:${{ github.sha }}
         docker push ${{ secrets.DOCKERHUB_USERNAME }}/todolist-app:${{ github.sha }}
 
-  deploy:
-    needs: build-and-test
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
-    
-    steps:
-    - name: Deploy to Production
-      uses: appleboy/ssh-action@master
-      with:
-        host: ${{ secrets.SERVER_HOST }}
-        username: ${{ secrets.SERVER_USER }}
-        key: ${{ secrets.SERVER_SSH_KEY }}
-        script: |
-          docker pull ${{ secrets.DOCKERHUB_USERNAME }}/todolist-app:${{ github.sha }}
-          docker stop todolist-app || true
-          docker rm todolist-app || true
-          docker run -d \
-            --name todolist-app \
-            -p 8080:8080 \
-            -e DATABASE_URL=jdbc:postgresql://todolist_db:5432/todolist \
-            -e DATABASE_USERNAME=postgres \
-            -e DATABASE_PASSWORD=postgres \
-            -e SPRING_REDIS_HOST=redis \
-            -e SPRING_REDIS_PORT=6379 \
-            ${{ secrets.DOCKERHUB_USERNAME }}/todolist-app:${{ github.sha }}
+    - name: Run Tests
+        env:
+          DATABASE_URL: jdbc:postgresql://localhost:5432/todolist
+          DATABASE_USERNAME: postgres
+          DATABASE_PASSWORD: postgres
+          SPRING_REDIS_HOST: localhost
+          SPRING_REDIS_PORT: 6379
+          SPRING_PROFILES_ACTIVE: test
+        run: mvn test
 
-           - name: Deployed!!
-              if: success()
-              run: echo "🚀 TodoList App desplegada exitosamente en $(date)"
+      - name: Deployed!!
+          if: success()
+          run: echo "🚀 TodoList App desplegada exitosamente en $(date)"
