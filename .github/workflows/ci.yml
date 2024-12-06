@@ -7,73 +7,34 @@ on:
     branches: "master"
 
 jobs:
-  run-tests:
+  build-and-test:
+    name: Build and Test with Docker Compose
     runs-on: ubuntu-latest
-    
+
     steps:
-    # Paso 1: Checkout del código
     - name: Checkout code
-      uses: actions/checkout@v4
-    
-    # Paso 2: Configurar JDK
-    - name: Set up JDK 17
-      uses: actions/setup-java@v3
-      with:
-        java-version: '17'
-        distribution: 'temurin'
-        cache: 'maven'
-    
-    # Paso 3: Configurar Docker Compose
+      uses: actions/checkout@v3
+
     - name: Set up Docker Compose
-      uses: docker/setup-buildx-action@v3
-    
-    # Paso 4: Construir servicios de Docker Compose
-    - name: Build Docker Compose Services
-      run: docker-compose build --no-cache
-    
-    # Paso 5: Iniciar servicios
-    - name: Start Services
-      run: docker-compose up -d
-    
-    # Paso 6: Verificar estado de los servicios
-    - name: Check Service Health
+      run: docker-compose version
+
+    - name: Build and Run Services
+      run: docker-compose up --build -d
+
+    - name: Wait for Services to be Healthy
       run: |
+        echo "Waiting for services to be healthy..."
         docker-compose ps
         docker-compose logs
-    
-    # Paso 7: Esperar a que los servicios estén listos
-    - name: Wait for Services to be Ready
-      run: |
-        max_attempts=10
-        attempt=0
-        
-        while [ $attempt -lt $max_attempts ]; do
-          if docker-compose exec -T todolist_db pg_isready && 
-             docker-compose exec -T redis redis-cli ping; then
-            echo "Services are ready!"
-            break
-          fi
-          
-          attempt=$((attempt+1))
-          echo "Waiting for services... (Attempt $attempt)"
-          sleep 10
-        done
-    
-    # Paso 8: Ejecutar pruebas
-    - name: Run Tests
-      run: |
-        docker-compose run --rm todolist_test
-      timeout-minutes: 10
-    
-    # Paso 9: Capturar logs en caso de fallo
-    - name: Capture Test Logs
-      if: failure()
-      run: |
-        docker-compose logs todolist_test
-        docker-compose logs todolist_db
-        docker-compose logs redis
-    
+        sleep 20
 
-    - name: Deployed!!
+    - name: Run Tests
+      run: docker-compose run --rm todolist_test
+
+    - name: Simulate Deployment
       if: success()
       run: echo "🚀 TodoList App desplegada exitosamente en $(date)"
+
+    - name: Clean Up
+      if: always()
+      run: docker-compose down --volumes --remove-orphans
